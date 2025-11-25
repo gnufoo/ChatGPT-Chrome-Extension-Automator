@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    html {
+      width: 320px;
+      height: 500px;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      width: 320px;
+      height: 500px;
+      max-height: 500px;
+      margin: 0;
+      padding: 15px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9f9f9;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+    
+    h2 { 
+      margin-top: 0; 
+      font-size: 16px; 
+      color: #333; 
+      display: flex; 
+      align-items: center; 
+      gap: 8px;
+    }
+    
+    /* Layout */
+    .control-group {
+      background: white;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #e5e5e5;
+      margin-bottom: 12px;
+    }
+    label { font-size: 11px; font-weight: bold; color: #666; display: block; margin-bottom: 5px; }
+
+    textarea {
+      width: 100%;
+      height: 60px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 8px;
+      font-family: inherit;
+      font-size: 12px;
+      resize: vertical;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 13px;
+      transition: background 0.2s;
+    }
+    
+    /* Button Variants */
+    .btn-primary { background-color: #10a37f; color: white; }
+    .btn-primary:hover { background-color: #0d8a6a; }
+    
+    .btn-secondary { background-color: #444654; color: white; margin-top: 8px; }
+    .btn-secondary:hover { background-color: #343541; }
+
+    button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+    /* Response Area */
+    #response-area {
+      margin-top: 15px;
+      padding: 10px;
+      background: #fff;
+      border-radius: 4px;
+      border: 1px solid #e5e5e5;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      display: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    #response-area.show,
+    #response-area[style*="display: block"] {
+      display: block !important;
+    }
+    
+    #response-text {
+      margin-top: 5px;
+      color: #333;
+      line-height: 1.5;
+      display: block;
+      width: 100%;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    
+    .status { 
+      font-size: 11px; 
+      color: #666; 
+      margin-top: 8px; 
+      text-align: center; 
+      min-height: 16px;
+    }
+    
+    .badge { 
+      font-size: 10px; 
+      background: #eee; 
+      padding: 2px 6px; 
+      border-radius: 4px; 
+      color: #555; 
+    }
+  </style>
+</head>
+<body>
+  <h2>
+    Bless ChatGPT Automator 
+    <span class="badge">v2.0</span>
+  </h2>
+
+  <!-- Manual Mode -->
+  <div class="control-group">
+    <label>MANUAL INPUT</label>
+    <textarea id="prompt-input" placeholder="Type a prompt..."></textarea>
+    <button id="send-btn" class="btn-primary">Send & Capture</button>
+  </div>
+
+  <!-- Auto Mode -->
+  <div class="control-group">
+    <label>FULLY AUTOMATIC</label>
+    <div style="font-size: 11px; color: #888; margin-bottom: 8px; line-height: 1.3;">
+      Generates a random prompt, sends it, and captures the result automatically.
+    </div>
+    <button id="random-btn" class="btn-secondary">Random Auto-Send</button>
+  </div>
+
+  <div id="status-msg" class="status"></div>
+  
+  <div id="response-area" style="display: none;">
+    <strong style="color:#10a37f; display: block; margin-bottom: 8px; font-size: 13px;">ChatGPT Response:</strong>
+    <div id="response-text" style="color: #333; line-height: 1.6;"></div>
+  </div>
+
+  <script src="chatgpt-api.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChatGPT API - Example Usage</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #10a37f;
+      margin-top: 0;
+    }
+    .input-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #333;
+    }
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    button {
+      background: #10a37f;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #0d8a6a;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .status {
+      margin: 15px 0;
+      padding: 10px;
+      border-radius: 4px;
+      background: #f0f0f0;
+      color: #666;
+      font-size: 14px;
+    }
+    .status.error {
+      background: #fee;
+      color: #c33;
+    }
+    .status.success {
+      background: #efe;
+      color: #3c3;
+    }
+    .response {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f9f9f9;
+      border-left: 4px solid #10a37f;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .code-block {
+      background: #f4f4f4;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 20px 0;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🤖 ChatGPT API - Example Usage</h1>
+    
+    <p>This example demonstrates how to use the ChatGPT Automation API in your application.</p>
+
+    <div class="input-group">
+      <label for="prompt">Enter your prompt:</label>
+      <textarea id="prompt" placeholder="Ask ChatGPT anything...">Explain quantum computing in simple terms</textarea>
+    </div>
+
+    <button id="sendBtn" onclick="sendPrompt()">Send Prompt</button>
+    <button id="checkBtn" onclick="checkAvailability()" style="background: #666; margin-left: 10px;">Check Availability</button>
+
+    <div id="status" class="status" style="display: none;"></div>
+    <div id="response" class="response" style="display: none;"></div>
+
+    <h2>Code Example</h2>
+    <div class="code-block">
+<pre>// Initialize the API
+const api = await createChatGPTAPI();
+
+// Send a prompt
+try {
+  const response = await api.sendPrompt("Your prompt here", {
+    onProgress: (status) => {
+      console.log("Status:", status);
+    }
+  });
+  console.log("Response:", response);
+} catch (error) {
+  console.error("Error:", error.message);
+}</pre>
+    </div>
+  </div>
+
+  <!-- Include the ChatGPT API -->
+  <script src="chatgpt-api.js"></script>
+  
+  <script>
+    let chatGPTAPI = null;
+
+    // Initialize API when page loads
+    (async () => {
+      try {
+        chatGPTAPI = await createChatGPTAPI();
+        updateStatus("API initialized and ready!", "success");
+      } catch (error) {
+        updateStatus("Failed to initialize API: " + error.message, "error");
+      }
+    })();
+
+    function updateStatus(message, type = "") {
+      const statusEl = document.getElementById("status");
+      statusEl.textContent = message;
+      statusEl.className = "status " + type;
+      statusEl.style.display = "block";
+    }
+
+    function updateResponse(text) {
+      const responseEl = document.getElementById("response");
+      responseEl.textContent = text;
+      responseEl.style.display = "block";
+    }
+
+    async function checkAvailability() {
+      if (!chatGPTAPI) {
+        updateStatus("API not initialized", "error");
+        return;
+      }
+
+      const isAvailable = await chatGPTAPI.isAvailable();
+      if (isAvailable) {
+        updateStatus("✅ ChatGPT is available and ready!", "success");
+      } else {
+        updateStatus("❌ ChatGPT tab not found. Please open ChatGPT in a browser tab.", "error");
+      }
+    }
+
+    async function sendPrompt() {
+      if (!chatGPTAPI) {
+        updateStatus("API not initialized", "error");
+        return;
+      }
+
+      const prompt = document.getElementById("prompt").value.trim();
+      if (!prompt) {
+        updateStatus("Please enter a prompt", "error");
+        return;
+      }
+
+      const sendBtn = document.getElementById("sendBtn");
+      sendBtn.disabled = true;
+      updateStatus("Sending prompt...");
+      document.getElementById("response").style.display = "none";
+
+      try {
+        // Check availability first
+        const isAvailable = await chatGPTAPI.isAvailable();
+        if (!isAvailable) {
+          updateStatus("❌ ChatGPT tab not found. Please open ChatGPT in a browser tab.", "error");
+          sendBtn.disabled = false;
+          return;
+        }
+
+        // Send prompt with progress updates
+        const response = await chatGPTAPI.sendPrompt(prompt, {
+          onProgress: (status) => {
+            updateStatus(status);
+          }
+        });
+
+        updateStatus("✅ Response received!", "success");
+        updateResponse(response);
+        sendBtn.disabled = false;
+
+      } catch (error) {
+        updateStatus("❌ Error: " + error.message, "error");
+        sendBtn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
+
